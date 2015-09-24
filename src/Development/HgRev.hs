@@ -19,7 +19,8 @@ import           Data.List                  (isInfixOf)
 import           Data.Maybe                 (listToMaybe)
 import           System.Exit                (ExitCode (..))
 import           System.FilePath            (FilePath)
-import           System.Process             (readProcessWithExitCode)
+import           System.Process             (cwd, proc,
+                                             readCreateProcessWithExitCode)
 
 
 hgRevState :: FilePath -> IO (Maybe (HgRev, HgState))
@@ -30,29 +31,29 @@ hgRevState repo = do
 
 
 hgRev :: FilePath -> IO (Maybe HgRev)
-hgRev repo = do
-    (ec, stdout, _) <- readProcessWithExitCode hg args stdin
-    return . join . maybeExitCode ec $ parse stdout
+hgRev repo = join . fmap parse <$> runHg repo args
       where
-        hg = "hg"
-        args = ["log", "-r.", "-Tjson", "--config='defaults.log='", "-R", repo]
-        stdin = ""
+        args = ["log", "-r.", "-Tjson", "--config='defaults.log='"]
         parse = join . fmap listToMaybe . decode' . pack
 
 
+-- hg does not yet have a programmatic way to get dirty state of
+-- working dir so this separate call is needed.
 hgState :: FilePath -> IO (Maybe HgState)
-hgState repo = do
-    (ec, stdout, _) <- readProcessWithExitCode hg args stdin
-    return . maybeExitCode ec $ bool Clean Dirty $ "+" `isInfixOf` stdout
+hgState repo = (fmap . fmap) check $ runHg repo args
       where
-        hg = "hg"
-        args = ["identify", "--config='defaults.identify=-i'", "-R", repo]
-        stdin = ""
+        args = ["identify", "-i", "--config='defaults.identify='"]
+        check = bool Clean Dirty . (isInfixOf "+")
 
 
-maybeExitCode :: ExitCode -> a -> Maybe a
-maybeExitCode ExitSuccess x = Just x
-maybeExitCode (ExitFailure _) _ = Nothing
+runHg :: FilePath -> [String] -> IO (Maybe String)
+runHg repo args = do
+    (ec, stdout, _) <- readCreateProcessWithExitCode (setCwd repo $ proc "hg" args) ""
+    return $ maybeExitCode ec stdout
+  where
+    maybeExitCode ExitSuccess x = Just x
+    maybeExitCode (ExitFailure _) _ = Nothing
+    setCwd y x = x{cwd= Just y}
 
 
 data HgRev =
@@ -66,6 +67,7 @@ data HgRev =
 
 data HgState = Clean | Dirty deriving (Show, Eq)
 
+
 instance FromJSON HgRev where
     parseJSON (Object x) =
         HgRev
@@ -74,6 +76,7 @@ instance FromJSON HgRev where
         <*> x .: "tags"
         <*> x .: "bookmarks"
     parseJSON invalid = typeMismatch "HgRev" invalid
+
 
 instance ToJSON HgRev where
     toJSON x =

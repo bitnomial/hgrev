@@ -16,9 +16,10 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  -- exposed-modules:
-  -- other-modules:
-  -- other-extensions:
+  exposed-modules:
+                  Development.HgRev.TH
+                , Development.HgRev
+
   build-depends:       aeson >= 0.8.0.2
                      , base >=4.8 && <4.9
                      , bytestring >= 0.10
