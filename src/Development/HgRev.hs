@@ -26,14 +26,18 @@ import           System.Process             (cwd, proc,
                                              readCreateProcessWithExitCode)
 
 
-hgRevState :: FilePath -> IO (Maybe (HgRev, HgState))
+-- | Get the hg revision and working directory state for a given repo.
+hgRevState :: FilePath -- ^ Path anywhere within the repository
+           -> IO (Maybe (HgRev, HgState)) -- ^ Nothing is returned if no repo or `hg` binary are found
 hgRevState repo = do
     rev <- hgRev repo
     state <- hgState repo
     return $ (,) <$> rev <*> state
 
 
-hgRev :: FilePath -> IO (Maybe HgRev)
+-- | Get the hg revision for a given repo.
+hgRev :: FilePath -- ^ Path anywhere within the repository
+      -> IO (Maybe HgRev) -- ^ Nothing is returned if no repo or `hg` binary are found
 hgRev repo = join . fmap parse <$> runHg repo args
       where
         args = ["log", "-r.", "-Tjson", "--config='defaults.log='"]
@@ -42,7 +46,9 @@ hgRev repo = join . fmap parse <$> runHg repo args
 
 -- hg does not yet have a programmatic way to get dirty state of
 -- working dir so this separate call is needed.
-hgState :: FilePath -> IO (Maybe HgState)
+-- | Get the hg working directory state for a given repo.
+hgState :: FilePath -- ^ Path anywhere within the repository
+        -> IO (Maybe HgState) -- ^ Nothing is returned if no repo or `hg` binary are found
 hgState repo = (fmap . fmap) check $ runHg repo args
       where
         args = ["identify", "-i", "--config='defaults.identify='"]
@@ -61,14 +67,17 @@ runHg repo args = do
 
 data HgRev =
   HgRev
-  { hgRevision  :: String
-  , hgBranch    :: String
-  , hgTags      :: [String]
-  , hgBookmarks :: [String]
+  { hgRevision  :: String -- ^ Universally unique revision hash
+  , hgBranch    :: String -- ^ Branch name
+  , hgTags      :: [String] -- ^ Tags
+  , hgBookmarks :: [String] -- ^ Bookmarks
   } deriving (Show, Eq)
 
 
-data HgState = Clean | Dirty deriving (Show, Eq)
+data HgState
+    = Clean -- ^ No uncommitted changes in working directory
+    | Dirty -- ^ Uncommitted changes exist in working directory
+    deriving (Show, Eq)
 
 
 instance FromJSON HgRev where
@@ -81,9 +90,12 @@ instance FromJSON HgRev where
     parseJSON invalid = typeMismatch "HgRev" invalid
 
 
+-- | Get the hg short revision which is the first 12 hex characters of the hash.
 hgShortRev :: HgRev -> String
 hgShortRev = take 12 . hgRevision
 
+
+-- | Bool indication of dirty working directory state.
 hgIsDirty :: HgState -> Bool
 hgIsDirty Dirty = True
 hgIsDirty Clean = False

@@ -14,20 +14,41 @@ import           Language.Haskell.TH        (ExpQ, runIO, stringE)
 import           System.Directory           (getCurrentDirectory)
 
 
-hgRevStateTH :: (HgRev -> HgState -> String) -> ExpQ
+-- | Function to format hg rev and state info for printing
+type FormatFn = (HgRev -> HgState -> String)
+
+
+-- | Apply a format function and return a Template Haskell spliced
+-- string for compiling into code.
+hgRevStateTH :: FormatFn -> ExpQ
 hgRevStateTH format = do
     revState <- runIO $ hgRevState =<< getCurrentDirectory
     stringE $ maybe "UNKNOWN" (uncurry format) revState
 
 
-defFormat :: HgRev -> HgState -> String
+-- |
+-- >  long:  d9d3a1172a1d919b3056b435891081c0d7d00599
+-- >  short: d9d3a1172a1d
+-- >  dirty: true
+defFormat :: FormatFn
 defFormat rev state
     =  "\n  long:  " <> hgRevision rev
     <> "\n  short: " <> hgShortRev rev
     <> "\n  dirty: " <> (map toLower . show $ hgIsDirty state)
 
 
-jsonFormat :: HgRev -> HgState -> String
+-- |
+-- > {
+-- >   "dirty": true,
+-- >   "short rev": "d9d3a1172a1d",
+-- >   "branch": "default",
+-- >   "bookmarks": [],
+-- >   "revision": "d9d3a1172a1d919b3056b435891081c0d7d00599",
+-- >   "tags": [
+-- >     "tip"
+-- >   ]
+-- > }
+jsonFormat :: FormatFn
 jsonFormat rev state = unpack $ encode (rev, state)
 
 
