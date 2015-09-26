@@ -4,10 +4,13 @@ module Development.HgRev
        ( hgRevState
        , hgRev
        , hgState
+       , hgShortRev
+       , hgIsDirty
        , HgRev (..)
        , HgState (..)
        ) where
 
+import           Control.Applicative        ((<$>), (<*>))
 import           Control.Monad              (join)
 import           Data.Aeson                 (FromJSON (..), ToJSON (..),
                                              Value (..), decode', object, (.:),
@@ -78,11 +81,9 @@ instance FromJSON HgRev where
     parseJSON invalid = typeMismatch "HgRev" invalid
 
 
-instance ToJSON HgRev where
-    toJSON x =
-        object
-        [ "revision"  .= hgRevision x
-        , "branch"    .= hgBranch x
-        , "tags"      .= hgTags x
-        , "bookmarks" .= hgBookmarks x
-        ]
+hgShortRev :: HgRev -> String
+hgShortRev = take 12 . hgRevision
+
+hgIsDirty :: HgState -> Bool
+hgIsDirty Dirty = True
+hgIsDirty Clean = False
