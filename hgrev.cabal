@@ -29,9 +29,6 @@ description:
   .
   [Usage Example]
   .
-  > {-# LANGUAGE OverloadedStrings #-}
-  > {-# LANGUAGE TemplateHaskell   #-}
-  >
   > module Example where
   >
   > import           Data.Monoid          ((<>))
@@ -63,6 +60,11 @@ description:
   >
   .
   Check out the <https://hackage.haskell.org/package/gitrev gitrev> package for similar git functionality.
+
+extra-source-files:
+   README.md
+   Example.hs
+   LICENSE
 
 source-repository head
   type: git
