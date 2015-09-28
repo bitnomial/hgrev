@@ -8,15 +8,17 @@ maintainer:          luke@hoersten.org
 category:            Development
 build-type:          Simple
 cabal-version:       >=1.10
-homepage:      https://github.com/LukeHoersten/hgrev
-bug-reports:   https://github.com/LukeHoersten/hgrev/issues
+homepage:            https://github.com/LukeHoersten/hgrev
+bug-reports:         https://github.com/LukeHoersten/hgrev/issues
 
 description:
   [Overview]
   .
   `hgrev` provides two modules:
-  - `Development.HgRev` - <https://mercurial.selenic.com Mercurial (hg)> Haskell API
-  - `Development.HgRev.TH` - Template Haskell splice to compile version info into Haskell code
+  .
+  * `Development.HgRev` - <https://mercurial.selenic.com Mercurial (hg)> Haskell API
+  .
+  * `Development.HgRev.TH` - Template Haskell splice to compile version info into Haskell code
   .
   Use @$(hgRevStateTH defFormat)@ with Template Haskell enabled to insert the
   formatted version string.
@@ -29,9 +31,6 @@ description:
   .
   [Usage Example]
   .
-  > {-# LANGUAGE OverloadedStrings #-}
-  > {-# LANGUAGE TemplateHaskell   #-}
-  >
   > module Example where
   >
   > import           Data.Monoid          ((<>))
