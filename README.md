@@ -3,6 +3,7 @@
 ## Compile Mercurial (hg) version info into Haskell code
 
 - [HgRev Website](https://github.com/LukeHoersten/hgrev)
+- [HgRev Hackage](https://hackage.haskell.org/package/hgrev)
 - [Mercurial (hg)](https://mercurial.selenic.com)
 
 ### Overview
