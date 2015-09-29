@@ -41,7 +41,7 @@ hgRev :: FilePath -- ^ Path anywhere within the repository
       -> IO (Maybe HgRev) -- ^ Nothing is returned if no repo or `hg` binary are found
 hgRev repo = join . fmap parse <$> runHg repo args
       where
-        args = ["log", "-r.", "-Tjson", "--config='defaults.log='"]
+        args = ["log", "-r.", "-Tjson"]
         parse = join . fmap listToMaybe . decode' . pack
 
 
@@ -50,10 +50,10 @@ hgRev repo = join . fmap parse <$> runHg repo args
 -- | Get the hg working directory state for a given repo.
 hgState :: FilePath -- ^ Path anywhere within the repository
         -> IO (Maybe HgState) -- ^ Nothing is returned if no repo or `hg` binary are found
-hgState repo = fmap check <$> runHg repo args
+hgState repo = join . fmap parse <$> runHg repo args
       where
-        args = ["identify", "-i", "--config='defaults.identify='"]
-        check = bool Clean Dirty . isInfixOf "+"
+        args = ["status", "-Tjson"]
+        parse = decode' . pack
 
 
 runHg :: FilePath -> [String] -> IO (Maybe String)
@@ -68,8 +68,8 @@ runHg repo args = do
 
 data HgRev =
   HgRev
-  { hgRevision  :: String -- ^ Universally unique revision hash
-  , hgBranch    :: String -- ^ Branch name
+  { hgRevision  :: String   -- ^ Universally unique revision hash
+  , hgBranch    :: String   -- ^ Branch name
   , hgTags      :: [String] -- ^ Tags
   , hgBookmarks :: [String] -- ^ Bookmarks
   } deriving (Show, Eq)
@@ -79,6 +79,13 @@ data HgState
     = Clean -- ^ No uncommitted changes in working directory
     | Dirty -- ^ Uncommitted changes exist in working directory
     deriving (Show, Eq)
+
+
+instance FromJSON HgState where
+    parseJSON (Array x)
+        | null x    = return Clean
+        | otherwise = return Dirty
+    parseJSON invalid = typeMismatch "HgState" invalid
 
 
 instance FromJSON HgRev where
