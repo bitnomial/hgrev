@@ -19,10 +19,10 @@ insert the formatted version string.
 
 ### Requirements
 
-`hgrev` requires the `hg` binary is installed and available on the
-system.  `Development.HgRev.HgRev` and `Development.HgRev.HgState` are
-obtained via two separate calls to `hg` because working directory
-state isn't available programmatically.
+`hgrev` requires the `hg` binary version 3.2 or greater is installed
+and available on the system.  `Development.HgRev.HgRev` and
+`Development.HgRev.HgState` are obtained via two separate calls to
+`hg` because working directory state isn't available programmatically.
 
 ### Usage Example
 
