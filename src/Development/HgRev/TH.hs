@@ -9,7 +9,7 @@ import           Data.Char                  (toLower)
 import           Data.Maybe                 (fromMaybe)
 import           Data.Monoid                ((<>))
 import           Development.HgRev          (HgRev (..), HgState (..),
-                                             hgIsDirty, hgRevState, hgShortRev)
+                                             hgIsClean, hgRevState, hgShortRev)
 import           Language.Haskell.TH        (ExpQ, runIO, stringE)
 import           System.Directory           (getCurrentDirectory)
 
@@ -29,21 +29,21 @@ hgRevStateTH format = do
 -- |
 -- >  long:  d9d3a1172a1d919b3056b435891081c0d7d00599
 -- >  short: d9d3a1172a1d
--- >  dirty: true
+-- >  clean: true
 defFormat :: FormatFn
 defFormat rev state
     =  "\n  long:  " <> hgRevision rev
     <> "\n  short: " <> hgShortRev rev
-    <> "\n  dirty: " <> (map toLower . show $ hgIsDirty state)
+    <> "\n  clean: " <> (map toLower . show $ hgIsClean state)
 
 
 -- |
 -- > {
--- >   "dirty": true,
--- >   "short rev": "d9d3a1172a1d",
+-- >   "clean": true,
+-- >   "short": "d9d3a1172a1d",
 -- >   "branch": "default",
 -- >   "bookmarks": [],
--- >   "revision": "d9d3a1172a1d919b3056b435891081c0d7d00599",
+-- >   "long": "d9d3a1172a1d919b3056b435891081c0d7d00599",
 -- >   "tags": [
 -- >     "tip"
 -- >   ]
@@ -55,10 +55,10 @@ jsonFormat rev state = unpack $ encode (rev, state)
 instance ToJSON (HgRev, HgState) where
     toJSON (r, s) =
         object
-        [ "revision"  .= hgRevision r
-        , "short rev" .= hgShortRev r
+        [ "long"      .= hgRevision r
+        , "short"     .= hgShortRev r
         , "branch"    .= hgBranch r
         , "tags"      .= hgTags r
         , "bookmarks" .= hgBookmarks r
-        , "dirty"     .= hgIsDirty s
+        , "clean"     .= hgIsClean s
         ]

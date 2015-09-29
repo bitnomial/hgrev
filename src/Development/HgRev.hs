@@ -6,6 +6,7 @@ module Development.HgRev
        , hgState
        , hgShortRev
        , hgIsDirty
+       , hgIsClean
        , HgRev (..)
        , HgState (..)
        ) where
@@ -49,10 +50,10 @@ hgRev repo = join . fmap parse <$> runHg repo args
 -- | Get the hg working directory state for a given repo.
 hgState :: FilePath -- ^ Path anywhere within the repository
         -> IO (Maybe HgState) -- ^ Nothing is returned if no repo or `hg` binary are found
-hgState repo = (fmap . fmap) check $ runHg repo args
+hgState repo = fmap check <$> runHg repo args
       where
         args = ["identify", "-i", "--config='defaults.identify='"]
-        check = bool Clean Dirty . (isInfixOf "+")
+        check = bool Clean Dirty . isInfixOf "+"
 
 
 runHg :: FilePath -> [String] -> IO (Maybe String)
@@ -99,3 +100,9 @@ hgShortRev = take 12 . hgRevision
 hgIsDirty :: HgState -> Bool
 hgIsDirty Dirty = True
 hgIsDirty Clean = False
+
+
+-- | Bool indication of clean working directory state.
+hgIsClean :: HgState -> Bool
+hgIsClean Dirty = False
+hgIsClean Clean = True
