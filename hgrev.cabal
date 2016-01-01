@@ -1,5 +1,5 @@
 name:                hgrev
-version:             0.1.4
+version:             0.1.5
 synopsis:            Compile Mercurial (hg) version info into Haskell code
 license:             MIT
 license-file:        LICENSE
@@ -64,9 +64,8 @@ description:
   Check out the <https://hackage.haskell.org/package/gitrev gitrev> package for similar git functionality.
 
 
-extra-source-files:
-                   Example.hs
-                 , README.md
+extra-source-files: Example.hs
+                  , README.md
 
 source-repository head
   type: git
