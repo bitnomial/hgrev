@@ -1,7 +1,5 @@
-resolver: lts-3.17
+resolver: nightly-2016-05-31
 flags: {}
 packages:
-  - '.'
-extra-deps:
-  - aeson-0.10.0.0
-  - attoparsec-0.13.0.1
+  - location: '.'
+extra-deps: []

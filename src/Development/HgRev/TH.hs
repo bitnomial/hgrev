@@ -4,9 +4,8 @@
 module Development.HgRev.TH where
 
 import           Data.Aeson                 (ToJSON (..), encode, object, (.=))
-import           Data.ByteString.Lazy.Char8 (pack, unpack)
+import           Data.ByteString.Lazy.Char8 (unpack)
 import           Data.Char                  (toLower)
-import           Data.Maybe                 (fromMaybe)
 import           Data.Monoid                ((<>))
 import           Development.HgRev          (HgRev (..), HgState (..),
                                              hgIsClean, hgRevState, hgShortRev)
@@ -49,11 +48,14 @@ defFormat rev state
 -- >   ]
 -- > }
 jsonFormat :: FormatFn
-jsonFormat rev state = unpack $ encode (rev, state)
+jsonFormat rev state = unpack . encode $ HgRevState (rev, state)
 
 
-instance ToJSON (HgRev, HgState) where
-    toJSON (r, s) =
+newtype HgRevState = HgRevState (HgRev, HgState)
+
+
+instance ToJSON HgRevState where
+    toJSON (HgRevState (r, s)) =
         object
         [ "long"      .= hgRevision r
         , "short"     .= hgShortRev r
