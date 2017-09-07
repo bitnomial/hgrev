@@ -1,15 +1,16 @@
 name:                hgrev
-version:             0.2.1
+version:             0.2.2
 synopsis:            Compile Mercurial (hg) version info into Haskell code
 license:             MIT
 license-file:        LICENSE
 author:              Luke Hoersten
-maintainer:          luke@hoersten.org
+maintainer:          luke@bitnomial.com
+copyright:           Bitnomial, Inc. (c) 2016
 category:            Development
 build-type:          Simple
 cabal-version:       >=1.10
-homepage:            https://github.com/LukeHoersten/hgrev
-bug-reports:         https://github.com/LukeHoersten/hgrev/issues
+homepage:            https://github.com/bitnomial/hgrev
+bug-reports:         https://github.com/bitnomial/hgrev/issues
 
 description:
   [Overview]
@@ -69,7 +70,7 @@ extra-source-files: Example.hs
 
 source-repository head
   type: git
-  location: git://github.com/LukeHoersten/hgrev.git
+  location: git://github.com/bitnomial/hgrev.git
 
 library
   exposed-modules: Development.HgRev
