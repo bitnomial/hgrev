@@ -1,7 +1,7 @@
 name:                hgrev
 version:             0.2.2
 synopsis:            Compile Mercurial (hg) version info into Haskell code
-license:             MIT
+license:             BSD3
 license-file:        LICENSE
 author:              Luke Hoersten
 maintainer:          luke@bitnomial.com
