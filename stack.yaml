@@ -1,5 +1,5 @@
 resolver: lts-12.2
 flags: {}
 packages:
-  - location: '.'
+  - '.'
 extra-deps: []
