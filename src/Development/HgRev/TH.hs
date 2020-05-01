@@ -19,6 +19,16 @@ type FormatFn = (HgRev -> HgState -> String)
 
 -- | Apply a format function and return a Template Haskell spliced
 -- string for compiling into code.
+--
+-- @since 0.2.5
+hgRevStateTHDir :: FilePath -> FormatFn -> ExpQ
+hgRevStateTHDir dir format = do
+    revState <- runIO $ hgRevState dir
+    stringE $ maybe "UNKNOWN" (uncurry format) revState
+
+
+-- | Apply a format function and return a Template Haskell spliced
+-- string for compiling into code.
 hgRevStateTH :: FormatFn -> ExpQ
 hgRevStateTH format = do
     revState <- runIO $ hgRevState =<< getCurrentDirectory
