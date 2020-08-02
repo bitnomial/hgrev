@@ -1,5 +1,5 @@
 name:                hgrev
-version:             0.2.5
+version:             0.2.6
 synopsis:            Compile Mercurial (hg) version info into Haskell code
 license:             BSD3
 license-file:        LICENSE
@@ -76,7 +76,7 @@ library
   exposed-modules: Development.HgRev
                  , Development.HgRev.TH
 
-  build-depends: aeson            >= 0.8  && < 1.5
+  build-depends: aeson            >= 0.8  && < 1.6
                , base             >= 4.7  && < 4.15
                , bytestring       >= 0.10 && < 0.11
                , directory        >= 1.2  && < 1.4
